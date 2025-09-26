@@ -10,6 +10,7 @@ local removals = {
     "gco",
     "gcO",
     "<leader>uC",
+    "<leader>T",
   },
   x = {
     "gc",
@@ -73,6 +74,18 @@ keymaps.general = {
       end,
       desc = "Toggle Comment",
       expr = true,
+    },
+  },
+}
+
+keymaps.lsp = {
+  n = {
+    ["<leader>rn"] = {
+      function()
+        -- TODO: Rename
+        vim.notify("Rename not implemented yet")
+      end,
+      desc = "Rename",
     },
   },
 }
@@ -157,6 +170,15 @@ keymaps.snacks = {
         Snacks.picker.lsp_implementations()
       end,
       desc = "LSP Implementations",
+    },
+  },
+}
+
+keymaps.trouble = {
+  n = {
+    ["<leader>T"] = {
+      "<cmd>Trouble diagnostics toggle<cr>",
+      desc = "Trouble Diagnostics",
     },
   },
 }
