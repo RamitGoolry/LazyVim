@@ -30,6 +30,12 @@ end
 
 local Snacks = require("snacks")
 
+local function goto_preview_action(method)
+  return function()
+    require("goto-preview")[method]()
+  end
+end
+
 local keymaps = {}
 
 keymaps.general = {
@@ -189,6 +195,36 @@ keymaps.snacks = {
       end,
       desc = "Terminal",
     },
+  },
+}
+
+keymaps.goto_preview = {
+  n = {
+    ["<leader>pd"] = {
+      goto_preview_action("goto_preview_definition"),
+      desc = "Preview Definition",
+    },
+    ["<leader>pt"] = {
+      goto_preview_action("goto_preview_type_definition"),
+      desc = "Preview Type",
+    },
+    ["<leader>pi"] = {
+      goto_preview_action("goto_preview_implementation"),
+      desc = "Preview Implementation",
+    },
+    ["<leader>pr"] = {
+      goto_preview_action("goto_preview_references"),
+      desc = "Preview References",
+    },
+  },
+}
+
+keymaps.windows = {
+  n = {
+    ["<S-Left>"] = { "<C-w><", desc = "Decrease width" },
+    ["<S-Right>"] = { "<C-w>>", desc = "Increase width" },
+    ["<S-Up>"] = { "<C-w>-", desc = "Decrease height" },
+    ["<S-Down>"] = { "<C-w>+", desc = "Increase height" },
   },
 }
 
