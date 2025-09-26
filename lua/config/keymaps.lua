@@ -12,6 +12,7 @@ local removals = {
     "gco",
     "gcO",
     "<leader>uC",
+    "<leader>l",
   },
   x = {
     "gc",
@@ -172,7 +173,27 @@ keymaps.snacks = {
       desc = "Undotree",
     },
 
-    -- LSP
+    -- Terminal
+    ["<leader><leader>"] = {
+      function()
+        Snacks.terminal()
+      end,
+      desc = "Terminal",
+    },
+  },
+
+  t = {
+    ["<leader><leader>"] = {
+      function()
+        Snacks.terminal()
+      end,
+      desc = "Terminal",
+    },
+  },
+}
+
+keymaps.lsp = {
+  n = {
     ["<leader>lr"] = {
       function()
         Snacks.picker.lsp_references()
@@ -192,21 +213,27 @@ keymaps.snacks = {
       desc = "LSP Implementations",
     },
 
-    -- Terminal
-    ["<leader><leader>"] = {
+    ["K"] = {
       function()
-        Snacks.terminal()
+        vim.lsp.buf.hover()
       end,
-      desc = "Terminal",
+      desc = "Hover",
     },
-  },
 
-  t = {
-    ["<leader><leader>"] = {
+    ["<leader>l["] = {
       function()
-        Snacks.terminal()
+        ---@diagnostic disable-next-line: deprecated
+        vim.diagnostic.goto_prev()
       end,
-      desc = "Terminal",
+      desc = "LSP Previous diagnostic",
+    },
+
+    ["<leader>]"] = {
+      function()
+        ---@diagnostic disable-next-line: deprecated
+        vim.diagnostic.goto_next()
+      end,
+      desc = "LSP Next diagnostic",
     },
   },
 }
