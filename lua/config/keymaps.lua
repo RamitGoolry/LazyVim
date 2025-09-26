@@ -2,6 +2,8 @@ local removals = {
   -- Remove default keymaps from LazyVim that do not work for me
   n = {
     "<leader>n",
+    "<leader>e",
+    "<leader>E",
     "<leader>fg",
     "<leader>|",
     "<leader>-",
@@ -10,7 +12,6 @@ local removals = {
     "gco",
     "gcO",
     "<leader>uC",
-    "<leader>T",
   },
   x = {
     "gc",
@@ -156,7 +157,7 @@ keymaps.snacks = {
     },
 
     -- Themes
-    ["<leader>th"] = {
+    ["<leader>ft"] = {
       function()
         Snacks.picker.colorschemes()
       end,
@@ -172,19 +173,19 @@ keymaps.snacks = {
     },
 
     -- LSP
-    ["<leader>tr"] = {
+    ["<leader>lr"] = {
       function()
         Snacks.picker.lsp_references()
       end,
       desc = "LSP References",
     },
-    ["<leader>td"] = {
+    ["<leader>ld"] = {
       function()
         Snacks.picker.lsp_definitions()
       end,
       desc = "LSP Definitions",
     },
-    ["<leader>ti"] = {
+    ["<leader>li"] = {
       function()
         Snacks.picker.lsp_implementations()
       end,
