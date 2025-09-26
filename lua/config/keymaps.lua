@@ -130,6 +130,14 @@ keymaps.snacks = {
       end,
       desc = "Themes",
     },
+
+    -- Undotree
+    ["<leader>u"] = {
+      function()
+        Snacks.picker.undo()
+      end,
+      desc = "Undotree",
+    },
   },
 }
 
