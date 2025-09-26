@@ -1,7 +1,10 @@
 local removals = {
+  -- Remove default keymaps from LazyVim that do not work for me
   n = {
     "<leader>n",
     "<leader>fg",
+    "<leader>|",
+    "<leader>-",
   },
 }
 
@@ -14,6 +17,37 @@ end
 local Snacks = require("snacks")
 
 local keymaps = {}
+
+keymaps.general = {
+  n = {
+    ["<Esc>"] = {
+      function()
+        vim.cmd([[noh]])
+      end,
+      desc = "Clear highlights",
+    },
+
+    -- Switching betwen windows
+    ["<C-h>"] = { "<C-w>h", desc = "Window left" },
+    ["<C-j>"] = { "<C-w>j", desc = "Window down" },
+    ["<C-k>"] = { "<C-w>k", desc = "Window up" },
+    ["<C-l>"] = { "<C-w>l", desc = "Window right" },
+
+    -- Splitting Windows
+    ["<leader>%"] = {
+      function()
+        vim.cmd([[vsplit]])
+      end,
+      desc = "Split Window Right",
+    },
+    ['<leader>"'] = {
+      function()
+        vim.cmd([[split]])
+      end,
+      desc = "Split Window Bottom",
+    },
+  },
+}
 
 keymaps.snacks = {
   n = {
