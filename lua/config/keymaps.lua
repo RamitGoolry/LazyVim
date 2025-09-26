@@ -220,6 +220,17 @@ keymaps.trouble = {
   },
 }
 
+keymaps.dap = {
+  n = {
+    [".."] = {
+      function()
+        require("dap").step_over()
+      end,
+      desc = "Step Over",
+    },
+  },
+}
+
 local function apply_keymaps(collection)
   for _, modes in pairs(collection) do
     for mode, mappings in pairs(modes) do
