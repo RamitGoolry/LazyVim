@@ -5,6 +5,17 @@ local removals = {
     "<leader>fg",
     "<leader>|",
     "<leader>-",
+    "gc",
+    "gcc",
+    "gco",
+    "gcO",
+    "<leader>uC",
+  },
+  x = {
+    "gc",
+  },
+  o = {
+    "gc",
   },
 }
 
@@ -45,6 +56,23 @@ keymaps.general = {
         vim.cmd([[split]])
       end,
       desc = "Split Window Bottom",
+    },
+
+    ["<leader>/"] = {
+      function()
+        return require("vim._comment").operator() .. "_"
+      end,
+      desc = "Toggle Comment",
+      expr = true,
+    },
+  },
+  x = {
+    ["<leader>/"] = {
+      function()
+        return require("vim._comment").operator()
+      end,
+      desc = "Toggle Comment",
+      expr = true,
     },
   },
 }
@@ -93,6 +121,14 @@ keymaps.snacks = {
         })
       end,
       desc = "File Explorer",
+    },
+
+    -- Themes
+    ["<leader>th"] = {
+      function()
+        Snacks.picker.colorschemes()
+      end,
+      desc = "Themes",
     },
   },
 }
