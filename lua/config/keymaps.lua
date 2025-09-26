@@ -138,6 +138,26 @@ keymaps.snacks = {
       end,
       desc = "Undotree",
     },
+
+    -- LSP
+    ["<leader>tr"] = {
+      function()
+        Snacks.picker.lsp_references()
+      end,
+      desc = "LSP References",
+    },
+    ["<leader>td"] = {
+      function()
+        Snacks.picker.lsp_definitions()
+      end,
+      desc = "LSP Definitions",
+    },
+    ["<leader>ti"] = {
+      function()
+        Snacks.picker.lsp_implementations()
+      end,
+      desc = "LSP Implementations",
+    },
   },
 }
 
