@@ -23,7 +23,11 @@ return {
             return vim.fn.exepath("python3")
           end,
         }),
-        neotest_vitest,
+        neotest_vitest({
+          filter_dir = function(name)
+            return name ~= "node_modules"
+          end,
+        }),
         neotest_plenary,
       }
 
