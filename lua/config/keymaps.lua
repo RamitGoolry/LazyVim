@@ -300,6 +300,7 @@ keymaps.sidekick = {
       function()
         require("sidekick.cli").toggle({
           backend = "tmux",
+          focus = false,
         })
       end,
       desc = "Toggle Sidekick CLI",
