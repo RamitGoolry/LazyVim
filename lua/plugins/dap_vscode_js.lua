@@ -60,6 +60,16 @@ return {
         with_defaults({
           type = "pwa-node",
           request = "launch",
+          name = "Launch TS file",
+          program = "${file}",
+          runtimeExecutable = "node",
+          runtimeArgs = { "--loader", "tsx" },
+          sourceMaps = true,
+          console = "integratedTerminal",
+        }),
+        with_defaults({
+          type = "pwa-node",
+          request = "launch",
           name = "Launch npm run dev",
           runtimeExecutable = "npm",
           runtimeArgs = { "run", "dev" },
