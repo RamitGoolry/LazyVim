@@ -441,6 +441,74 @@ keymaps.kulala = {
   },
 }
 
+keymaps.git = {
+  n = {
+    ["<leader>gR"] = {
+      "",
+      desc = "+review",
+    },
+    ["<leader>gRs"] = {
+      function()
+        vim.cmd([[Octo review start]])
+      end,
+      desc = "Start Review",
+    },
+    ["<leader>gRc"] = {
+      function()
+        vim.cmd([[Octo review close]])
+      end,
+      desc = "Close Review",
+    },
+    ["<leader>gRr"] = {
+      function()
+        vim.cmd([[Octo review resume]])
+      end,
+      desc = "Resume Review",
+    },
+    ["<leader>gRb"] = {
+      function()
+        vim.cmd([[Octo review browse]])
+      end,
+      desc = "Browse Review",
+    },
+    ["<leader>gRd"] = {
+      function()
+        vim.cmd([[Octo review discard]])
+      end,
+      desc = "Discard Review",
+    },
+
+    ["<leader>gP"] = {
+      "",
+      desc = "+pr",
+    },
+    ["<leader>gPc"] = {
+      function()
+        vim.cmd([[Octo pr checkout]])
+      end,
+      desc = "Checkout PR",
+    },
+    ["<leader>gPl"] = {
+      function()
+        vim.cmd([[Octo pr list]])
+      end,
+      desc = "List PRs",
+    },
+    ["<leader>gPm"] = {
+      function()
+        vim.cmd([[Octo pr merge]])
+      end,
+      desc = "Merge PR",
+    },
+    ["<leader>gPR"] = {
+      function()
+        vim.cmd([[Octo pr reload]])
+      end,
+      desc = "Reload PR",
+    },
+  },
+}
+
 local function apply_keymaps(collection)
   for _, modes in pairs(collection) do
     for mode, mappings in pairs(modes) do
