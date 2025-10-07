@@ -477,6 +477,12 @@ keymaps.git = {
       end,
       desc = "Discard Review",
     },
+    ["<leader>gRS"] = {
+      function()
+        vim.cmd([[Octo review submit]])
+      end,
+      desc = "Submit Review",
+    },
 
     ["<leader>gP"] = {
       "",
