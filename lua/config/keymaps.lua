@@ -200,6 +200,10 @@ keymaps.snacks = {
 
 keymaps.goto_preview = {
   n = {
+    ["<leader>p"] = {
+      "",
+      desc = "+preview",
+    },
     ["<leader>pd"] = {
       goto_preview_action("goto_preview_definition"),
       desc = "Preview Definition",
@@ -230,6 +234,10 @@ keymaps.windows = {
 
 keymaps.lsp = {
   n = {
+    ["<leader>l"] = {
+      "",
+      desc = "+lsp",
+    },
     ["<leader>lr"] = {
       function()
         Snacks.picker.lsp_references()
@@ -354,6 +362,10 @@ keymaps.sidekick = {
 
 keymaps.kulala = {
   n = {
+    ["<leader>R"] = {
+      "",
+      desc = "+rest",
+    },
     ["<leader>Rb"] = {
       function()
         require("kulala").scratchpad()
