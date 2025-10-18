@@ -19,6 +19,10 @@ return {
       local neotest_vitest = require("neotest-vitest")
       local neotest_plenary = require("neotest-plenary")
 
+      opts.quickfix = {
+        open = false,
+      }
+
       opts.adapters = {
         neotest_python({
           dap = { justMyCode = false },

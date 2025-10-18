@@ -5,8 +5,8 @@ return {
       provider = "claude",
     },
     nes = {
-      enabled = true,
-      auto_fetch = true,
+      enabled = false,
+      auto_fetch = false,
     },
     backend = "tmux",
   },
