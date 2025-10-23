@@ -4,6 +4,10 @@ return {
     dir = vim.fn.stdpath("config") .. "/lua/plugins/neotest-vitest",
   },
   {
+    name = "neotest-hurl-local",
+    dir = vim.fn.stdpath("config") .. "/lua/plugins/neotest-hurl",
+  },
+  {
     "nvim-neotest/neotest",
     dependencies = {
       "nvim-neotest/nvim-nio",
@@ -13,10 +17,12 @@ return {
       "nvim-neotest/neotest-python",
       "nvim-neotest/neotest-plenary",
       "neotest-vitest-local",
+      "neotest-hurl-local",
     },
     opts = function(_, opts)
       local neotest_python = require("neotest-python")
       local neotest_vitest = require("neotest-vitest")
+      local neotest_hurl = require("neotest-hurl")
       local neotest_plenary = require("neotest-plenary")
 
       opts.quickfix = {
@@ -36,6 +42,7 @@ return {
             return name ~= "node_modules"
           end,
         }),
+        neotest_hurl(),
         neotest_plenary,
       }
 
