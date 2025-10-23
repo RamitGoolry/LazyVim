@@ -90,13 +90,6 @@ local function make_file_tree(path)
       path = path,
       range = { 0, 0, 0, 0 },
     },
-    {
-      type = "test",
-      id = ("%s::%s"):format(path, name),
-      name = name,
-      path = path,
-      range = { 0, 0, 0, 0 },
-    },
   }, function(pos)
     return pos.id
   end)
