@@ -195,18 +195,20 @@ local function create_adapter(opts)
   ---@param result neotest.StrategyResult
   ---@return table<string, neotest.Result>
   function adapter.results(spec, result)
+    local output = result.output
+    result.output = nil
     local status = result.code == 0 and "passed" or "failed"
     local results = {
       [spec.context.test_id] = {
         status = status,
-        output = result.output,
+        output = output,
         short = ("%s %s"):format(vim.fn.fnamemodify(spec.context.file_path, ":t"), status),
       },
     }
     if spec.context.parent_id then
       results[spec.context.parent_id] = {
         status = status,
-        output = result.output,
+        output = output,
       }
     end
     return results
