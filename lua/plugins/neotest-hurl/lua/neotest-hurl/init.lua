@@ -80,20 +80,38 @@ local function collect_test_nodes(node, acc, seen)
   return acc
 end
 
+local function display_name_from_file(path)
+  local ok, lines = pcall(vim.fn.readfile, path, "", 1)
+  if not ok or not lines or #lines == 0 then
+    return nil
+  end
+
+  local first_line = vim.trim(lines[1] or "")
+  if first_line == "" then
+    return nil
+  end
+
+  local comment = first_line:match("^%s*#+%s*(.+)$")
+  if comment and comment ~= "" then
+    return vim.trim(comment)
+  end
+end
+
 local function make_file_tree(path)
-  local name = vim.fn.fnamemodify(path, ":t")
+  local file_name = vim.fn.fnamemodify(path, ":t")
+  local test_name = display_name_from_file(path) or file_name
   return Tree.from_list({
     {
       type = "file",
       id = path,
-      name = name,
+      name = file_name,
       path = path,
       range = { 0, 0, 0, 0 },
     },
     {
       type = "test",
       id = ("%s::file"):format(path),
-      name = name,
+      name = test_name,
       path = path,
       range = { 0, 0, 0, 0 },
       parent = path,
