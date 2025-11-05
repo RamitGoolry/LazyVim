@@ -263,6 +263,63 @@ keymaps.lsp = {
       end,
       desc = "Hover",
     },
+    ["D"] = {
+      function()
+        local bufnr = vim.api.nvim_get_current_buf()
+        local clients = vim.lsp.get_clients({ bufnr = bufnr }) or {}
+        local client = clients[1]
+        if client == nil then
+          for _, value in pairs(clients) do
+            client = value
+            break
+          end
+        end
+        local offset_encoding = client and client.offset_encoding or "utf-16"
+        local params = vim.lsp.util.make_position_params(0, offset_encoding)
+
+        local function to_location(item)
+          if item == nil then
+            return nil
+          end
+
+          if item.uri ~= nil and item.range ~= nil then
+            return item
+          end
+
+          if item.targetUri ~= nil and item.targetRange ~= nil then
+            return {
+              uri = item.targetUri,
+              range = item.targetRange,
+            }
+          end
+
+          return nil
+        end
+
+        vim.lsp.buf_request(bufnr, "textDocument/definition", params, function(def_err, def_result)
+          if def_err then
+            vim.notify("Definition lookup failed: " .. def_err.message, vim.log.levels.ERROR)
+            return
+          end
+
+          local location
+
+          if vim.tbl_islist(def_result) then
+            location = to_location(def_result[1])
+          else
+            location = to_location(def_result)
+          end
+
+          if location == nil then
+            vim.notify("No definition available", vim.log.levels.INFO)
+            return
+          end
+
+          vim.lsp.util.preview_location(location)
+        end)
+      end,
+      desc = "Peek definition",
+    },
 
     ["<leader>l["] = {
       function()
