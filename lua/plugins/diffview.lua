@@ -97,15 +97,45 @@ return {
             { "n", "[x", actions.prev_conflict, { desc = "In the merge-tool: jump to the previous conflict" } },
             { "n", "]x", actions.next_conflict, { desc = "In the merge-tool: jump to the next conflict" } },
             { "n", "<leader>co", actions.conflict_choose("ours"), { desc = "Choose the OURS version of a conflict" } },
-            { "n", "<leader>ct", actions.conflict_choose("theirs"), { desc = "Choose the THEIRS version of a conflict" } },
+            {
+              "n",
+              "<leader>ct",
+              actions.conflict_choose("theirs"),
+              { desc = "Choose the THEIRS version of a conflict" },
+            },
             { "n", "<leader>cb", actions.conflict_choose("base"), { desc = "Choose the BASE version of a conflict" } },
             { "n", "<leader>ca", actions.conflict_choose("all"), { desc = "Choose all the versions of a conflict" } },
             { "n", "dx", actions.conflict_choose("none"), { desc = "Delete the conflict region" } },
-            { "n", "<leader>cO", actions.conflict_choose_all("ours"), { desc = "Choose the OURS version of a conflict for the whole file" } },
-            { "n", "<leader>cT", actions.conflict_choose_all("theirs"), { desc = "Choose the THEIRS version of a conflict for the whole file" } },
-            { "n", "<leader>cB", actions.conflict_choose_all("base"), { desc = "Choose the BASE version of a conflict for the whole file" } },
-            { "n", "<leader>cA", actions.conflict_choose_all("all"), { desc = "Choose all the versions of a conflict for the whole file" } },
-            { "n", "dX", actions.conflict_choose_all("none"), { desc = "Delete the conflict region for the whole file" } },
+            {
+              "n",
+              "<leader>cO",
+              actions.conflict_choose_all("ours"),
+              { desc = "Choose the OURS version of a conflict for the whole file" },
+            },
+            {
+              "n",
+              "<leader>cT",
+              actions.conflict_choose_all("theirs"),
+              { desc = "Choose the THEIRS version of a conflict for the whole file" },
+            },
+            {
+              "n",
+              "<leader>cB",
+              actions.conflict_choose_all("base"),
+              { desc = "Choose the BASE version of a conflict for the whole file" },
+            },
+            {
+              "n",
+              "<leader>cA",
+              actions.conflict_choose_all("all"),
+              { desc = "Choose all the versions of a conflict for the whole file" },
+            },
+            {
+              "n",
+              "dX",
+              actions.conflict_choose_all("none"),
+              { desc = "Delete the conflict region for the whole file" },
+            },
           },
           diff1 = {
             { "n", "g?", actions.help({ "view", "diff1" }), { desc = "Open the help panel" } },
@@ -166,8 +196,18 @@ return {
             { "n", "<leader>cO", actions.conflict_choose_all("ours"), { desc = "Choose OURS for the whole file" } },
             { "n", "<leader>cT", actions.conflict_choose_all("theirs"), { desc = "Choose THEIRS for the whole file" } },
             { "n", "<leader>cB", actions.conflict_choose_all("base"), { desc = "Choose BASE for the whole file" } },
-            { "n", "<leader>cA", actions.conflict_choose_all("all"), { desc = "Choose ALL versions for the whole file" } },
-            { "n", "dX", actions.conflict_choose_all("none"), { desc = "Delete the conflict region for the whole file" } },
+            {
+              "n",
+              "<leader>cA",
+              actions.conflict_choose_all("all"),
+              { desc = "Choose ALL versions for the whole file" },
+            },
+            {
+              "n",
+              "dX",
+              actions.conflict_choose_all("none"),
+              { desc = "Delete the conflict region for the whole file" },
+            },
           },
           file_history_panel = {
             { "n", "g!", actions.options, { desc = "Open the option panel" } },
@@ -214,6 +254,93 @@ return {
           },
         },
       }
+    end,
+    config = function(_, opts)
+      local diffview = require("diffview")
+      diffview.setup(opts)
+
+      local uv = vim.uv or vim.loop
+      if not uv then
+        return
+      end
+
+      local timer
+      local timer_running = false
+
+      local function stop_timer(close)
+        if not timer then
+          return
+        end
+        timer:stop()
+        timer_running = false
+        if close then
+          timer:close()
+          timer = nil
+        end
+      end
+
+      local function get_views()
+        local ok, lib = pcall(require, "diffview.lib")
+        if not ok then
+          return nil
+        end
+        return lib.views
+      end
+
+      local function refresh_views()
+        local views = get_views()
+        if not views or next(views) == nil then
+          stop_timer(false)
+          return
+        end
+
+        for _, view in ipairs(views) do
+          if view and view.emitter and view.emitter.emit then
+            pcall(function()
+              view.emitter:emit("refresh_files")
+            end)
+          end
+        end
+      end
+
+      local function start_timer()
+        if timer_running then
+          return
+        end
+        timer = timer or uv.new_timer()
+        if not timer then
+          return
+        end
+        timer_running = true
+        timer:start(5000, 5000, vim.schedule_wrap(refresh_views))
+        vim.schedule(refresh_views)
+      end
+
+      local group = vim.api.nvim_create_augroup("DiffviewAutoRefresh", { clear = true })
+
+      vim.api.nvim_create_autocmd("User", {
+        pattern = "DiffviewViewOpened",
+        group = group,
+        callback = start_timer,
+      })
+
+      vim.api.nvim_create_autocmd("User", {
+        pattern = "DiffviewViewClosed",
+        group = group,
+        callback = function()
+          local views = get_views()
+          if not views or next(views) == nil then
+            stop_timer(false)
+          end
+        end,
+      })
+
+      vim.api.nvim_create_autocmd("VimLeavePre", {
+        group = group,
+        callback = function()
+          stop_timer(true)
+        end,
+      })
     end,
   },
 }

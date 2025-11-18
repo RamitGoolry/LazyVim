@@ -572,6 +572,33 @@ keymaps.git = {
   },
 }
 
+keymaps.diffview = {
+  n = {
+    ["<leader>D"] = {
+      "",
+      desc = "+diffview",
+    },
+    ["<leader>Db"] = {
+      function()
+        vim.cmd([[DBUI]])
+      end,
+      desc = "Open DBUI",
+    },
+    ["<leader>Do"] = {
+      function()
+        vim.cmd([[DiffviewOpen]])
+      end,
+      desc = "Open Diffview",
+    },
+    ["<leader>Dc"] = {
+      function()
+        vim.cmd([[DiffviewClose]])
+      end,
+      desc = "Close Diffview",
+    },
+  },
+}
+
 local function apply_keymaps(collection)
   for _, modes in pairs(collection) do
     for mode, mappings in pairs(modes) do
