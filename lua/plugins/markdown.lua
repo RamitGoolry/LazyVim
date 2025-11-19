@@ -11,4 +11,12 @@ return {
       end, opts.linters_by_ft.markdown or {})
     end,
   },
+  -- Disable marksman LSP for markdown
+  {
+    "neovim/nvim-lspconfig",
+    opts = function(_, opts)
+      opts.servers = opts.servers or {}
+      opts.servers.marksman = { enabled = false }
+    end,
+  },
 }
