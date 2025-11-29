@@ -4,6 +4,10 @@ return {
     dir = vim.fn.stdpath("config") .. "/lua/plugins/neotest-vitest",
   },
   {
+    name = "neotest-hurl",
+    dir = "/home/ramit/projects/neotest-hurl",
+  },
+  {
     "nvim-neotest/neotest",
     dependencies = {
       "nvim-neotest/nvim-nio",
@@ -13,7 +17,7 @@ return {
       "nvim-neotest/neotest-python",
       "nvim-neotest/neotest-plenary",
       "neotest-vitest-local",
-      "RamitGoolry/neotest-hurl",
+      "neotest-hurl",
     },
     opts = function(_, opts)
       local neotest_python = require("neotest-python")
