@@ -82,4 +82,8 @@ return {
     "navarasu/onedark.nvim",
     lazy = true,
   },
+  {
+    "ellisonleao/gruvbox.nvim",
+    lazy = true,
+  },
 }
