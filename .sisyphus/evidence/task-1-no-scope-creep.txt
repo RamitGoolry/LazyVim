@@ -1,0 +1,5 @@
+Forbidden keywords count: 0
+0
+Extra config keywords count: 0
+0
+SCOPE_CREEP_DETECTED
