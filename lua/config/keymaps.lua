@@ -130,7 +130,31 @@ keymaps.snacks = {
     -- Picker
     ["<leader>fg"] = {
       function()
-        Snacks.picker.grep()
+        -- Snacks's grep parses a ` -- ` separator in the prompt and forwards
+        -- everything after it as extra args to ripgrep (see snacks.picker.util.parse).
+        -- These chords append a flag so you can refine by glob/filetype without
+        -- remembering the syntax — e.g. `useState`<a-t>`tsx` -> `useState -- -t tsx`.
+        local function append_flag(flag)
+          return function(picker)
+            local cur = picker.input.filter.search or ""
+            local sep = cur:find("%s%-%-%s") and " " or " -- "
+            picker.input:set(nil, cur .. sep .. flag .. " ")
+          end
+        end
+        Snacks.picker.grep({
+          actions = {
+            grep_filetype = { action = append_flag("-t"), desc = "Filter by filetype" },
+            grep_glob = { action = append_flag("-g"), desc = "Filter by glob" },
+          },
+          win = {
+            input = {
+              keys = {
+                ["<a-t>"] = { "grep_filetype", mode = { "i", "n" }, desc = "Filter by filetype" },
+                ["<a-g>"] = { "grep_glob", mode = { "i", "n" }, desc = "Filter by glob" },
+              },
+            },
+          },
+        })
       end,
       desc = "Grep Files",
     },
