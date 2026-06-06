@@ -1,5 +1,10 @@
+local function sidekick_backend()
+  return vim.env.HERDR_ENV == "1" and "herdr" or "tmux"
+end
+
 return {
-  "folke/sidekick.nvim",
+  dir = vim.fn.stdpath("config") .. "/vendor/sidekick.nvim",
+  name = "sidekick.nvim",
   opts = {
     ai = {
       provider = "claude",
@@ -8,6 +13,11 @@ return {
       enabled = false,
       auto_fetch = false,
     },
-    backend = "tmux",
+    cli = {
+      mux = {
+        enabled = true,
+        backend = sidekick_backend(),
+      },
+    },
   },
 }

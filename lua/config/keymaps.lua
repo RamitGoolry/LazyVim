@@ -383,12 +383,16 @@ keymaps.dap = {
   },
 }
 
+local function sidekick_backend()
+  return vim.env.HERDR_ENV == "1" and "herdr" or "tmux"
+end
+
 keymaps.sidekick = {
   n = {
     ["<leader><leader>"] = {
       function()
         require("sidekick.cli").toggle({
-          backend = "tmux",
+          backend = sidekick_backend(),
           focus = false,
         })
       end,
@@ -397,7 +401,7 @@ keymaps.sidekick = {
     ["<leader>aa"] = {
       function()
         require("sidekick.cli").toggle({
-          backend = "tmux",
+          backend = sidekick_backend(),
         })
       end,
       desc = "Toggle Sidekick CLI",
