@@ -387,6 +387,63 @@ local function sidekick_backend()
   return vim.env.HERDR_ENV == "1" and "herdr" or "tmux"
 end
 
+local function sidekick_comment()
+  local selection = require("sidekick.cli").render("{selection}")
+
+  if not selection or vim.trim(selection) == "" then
+    vim.notify("Select some text before sending a Sidekick comment", vim.log.levels.WARN, { title = "Sidekick" })
+    return
+  end
+
+  local buf = vim.api.nvim_create_buf(false, true)
+  vim.bo[buf].bufhidden = "wipe"
+  vim.bo[buf].filetype = "markdown"
+  vim.api.nvim_buf_set_lines(buf, 0, -1, false, { "" })
+
+  local width = math.min(100, math.max(60, math.floor(vim.o.columns * 0.6)))
+  local win = vim.api.nvim_open_win(buf, true, {
+    relative = "cursor",
+    row = 1,
+    col = 0,
+    width = width,
+    height = 8,
+    style = "minimal",
+    border = "rounded",
+    title = "",
+    title_pos = "left",
+  })
+
+  vim.wo[win].wrap = true
+  vim.api.nvim_win_set_cursor(win, { 1, 0 })
+
+  local function close()
+    if vim.api.nvim_win_is_valid(win) then
+      vim.api.nvim_win_close(win, true)
+    end
+  end
+
+  local function draft()
+    local comment = table.concat(vim.api.nvim_buf_get_lines(buf, 0, -1, false), "\n")
+    if vim.trim(comment) == "" then
+      close()
+      return
+    end
+
+    close()
+    require("sidekick.cli").send({
+      backend = sidekick_backend(),
+      text = require("sidekick.text").to_text(comment .. "\n\n" .. selection),
+    })
+  end
+
+  vim.keymap.set({ "n", "i" }, "<CR>", draft, { buffer = buf, silent = true, desc = "Draft Sidekick Comment" })
+  vim.keymap.set("i", "<S-CR>", "<CR>", { buffer = buf, silent = true, desc = "Insert Newline" })
+  vim.keymap.set("n", "<S-CR>", "o", { buffer = buf, silent = true, desc = "Insert Newline" })
+  vim.keymap.set({ "n", "i" }, "<Esc>", close, { buffer = buf, silent = true, desc = "Cancel Sidekick Comment" })
+
+  vim.cmd.startinsert()
+end
+
 keymaps.sidekick = {
   n = {
     ["<leader><leader>"] = {
@@ -441,6 +498,12 @@ keymaps.sidekick = {
         require("sidekick").clear()
       end,
       desc = "Clear Sidekick",
+    },
+  },
+  x = {
+    ["<leader>ac"] = {
+      sidekick_comment,
+      desc = "Comment to Sidekick",
     },
   },
 }
