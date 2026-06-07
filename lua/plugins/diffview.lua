@@ -8,7 +8,7 @@ return {
       local function stage_selection()
         local ok, gitsigns = pcall(require, "gitsigns")
         if not ok then
-          vim.notify_once("Diffview stage requires gitsigns.nvim", vim.log.levels.WARN)
+          vim.notify_once("Diffview selection staging requires gitsigns.nvim", vim.log.levels.WARN)
           return
         end
 
@@ -23,19 +23,19 @@ return {
           range = { start_line, end_line }
         end
 
-        local ok_stage, err = pcall(function()
-          gitsigns.stage_hunk(range)
-        end)
-        if not ok_stage then
-          vim.notify("Failed to stage hunk: " .. tostring(err), vim.log.levels.ERROR)
-          return
-        end
+        gitsigns.stage_hunk(range, nil, function(err)
+          if err then
+            vim.schedule(function()
+              vim.notify("Failed to stage/unstage selection: " .. tostring(err), vim.log.levels.ERROR)
+            end)
+            return
+          end
 
-        if range then
           vim.schedule(function()
-            vim.cmd("normal! \\<Esc>")
+            vim.cmd("normal! \27")
+            actions.refresh_files()
           end)
-        end
+        end)
       end
 
       return {
@@ -57,7 +57,7 @@ return {
         },
         view = {
           default = {
-            layout = "diff2_horizontal",
+            layout = "diff2_vertical",
             disable_diagnostics = false,
             winbar_info = false,
           },
@@ -168,13 +168,14 @@ return {
               actions.conflict_choose_all("none"),
               { desc = "Delete the conflict region for the whole file" },
             },
-            { { "n", "x" }, "s", stage_selection, { desc = "Stage hunk" } },
+            { { "n", "x" }, "s", stage_selection, { desc = "Stage / unstage selection" } },
           },
           diff1 = {
             { "n", "g?", actions.help({ "view", "diff1" }), { desc = "Open the help panel" } },
           },
           diff2 = {
             { "n", "g?", actions.help({ "view", "diff2" }), { desc = "Open the help panel" } },
+            { { "n", "x" }, "s", stage_selection, { desc = "Stage / unstage selection" } },
           },
           diff3 = {
             { { "n", "x" }, "2do", actions.diffget("ours"), { desc = "Obtain the diff hunk from OURS" } },
