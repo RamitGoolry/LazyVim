@@ -388,11 +388,21 @@ local function sidekick_backend()
 end
 
 local function sidekick_comment()
-  local selection = require("sidekick.cli").render("{selection}")
+  local context = require("sidekick.cli.context").get()
+  local selection = context:render("{selection}")
 
   if not selection or vim.trim(selection) == "" then
     vim.notify("Select some text before sending a Sidekick comment", vim.log.levels.WARN, { title = "Sidekick" })
     return
+  end
+
+  local source = ""
+  local range = context.ctx.range
+  local name = vim.api.nvim_buf_get_name(context.ctx.buf)
+  if range and name ~= "" then
+    local file = vim.fn.fnamemodify(name, ":.")
+    local from, to = range.from[1], range.to[1]
+    source = from == to and ("@%s :L%d"):format(file, from) or ("@%s :L%d-L%d"):format(file, from, to)
   end
 
   local buf = vim.api.nvim_create_buf(false, true)
@@ -432,7 +442,7 @@ local function sidekick_comment()
     close()
     require("sidekick.cli").send({
       backend = sidekick_backend(),
-      text = require("sidekick.text").to_text(comment .. "\n\n" .. selection),
+      text = require("sidekick.text").to_text(comment .. "\n\n" .. source .. "\n" .. selection),
     })
   end
 
