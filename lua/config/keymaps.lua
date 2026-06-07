@@ -383,10 +383,6 @@ keymaps.dap = {
   },
 }
 
-local function sidekick_backend()
-  return vim.env.HERDR_ENV == "1" and "herdr" or "tmux"
-end
-
 local function sidekick_comment()
   local context = require("sidekick.cli.context").get()
   local selection = context:render("{selection}")
@@ -441,7 +437,6 @@ local function sidekick_comment()
 
     close()
     require("sidekick.cli").send({
-      backend = sidekick_backend(),
       text = require("sidekick.text").to_text(comment .. "\n\n" .. source .. "\n" .. selection),
     })
   end
@@ -459,7 +454,6 @@ keymaps.sidekick = {
     ["<leader><leader>"] = {
       function()
         require("sidekick.cli").toggle({
-          backend = sidekick_backend(),
           focus = false,
         })
       end,
@@ -467,9 +461,7 @@ keymaps.sidekick = {
     },
     ["<leader>aa"] = {
       function()
-        require("sidekick.cli").toggle({
-          backend = sidekick_backend(),
-        })
+        require("sidekick.cli").toggle()
       end,
       desc = "Toggle Sidekick CLI",
     },
