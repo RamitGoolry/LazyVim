@@ -665,11 +665,30 @@ keymaps.git = {
   },
 }
 
-keymaps.diffview = {
+local function close_diffs()
+  local closed = false
+
+  for _, win in ipairs(vim.api.nvim_tabpage_list_wins(0)) do
+    if vim.api.nvim_win_is_valid(win) then
+      local buf = vim.api.nvim_win_get_buf(win)
+      local name = vim.api.nvim_buf_get_name(buf)
+      if name:match("^diffs://") then
+        vim.api.nvim_win_close(win, true)
+        closed = true
+      end
+    end
+  end
+
+  if not closed then
+    vim.notify("No diffs.nvim view is open", vim.log.levels.INFO)
+  end
+end
+
+keymaps.diffs = {
   n = {
     ["<leader>D"] = {
       "",
-      desc = "+diffview",
+      desc = "+diffs",
     },
     ["<leader>Db"] = {
       function()
@@ -679,15 +698,31 @@ keymaps.diffview = {
     },
     ["<leader>Do"] = {
       function()
-        vim.cmd([[DiffviewOpen]])
+        vim.cmd([[Diff review ++layout=stacked]])
       end,
-      desc = "Open Diffview",
+      desc = "Open repo review",
+    },
+    ["<leader>Df"] = {
+      function()
+        vim.cmd([[Diff ++layout=split]])
+      end,
+      desc = "Open current file diff",
+    },
+    ["<leader>Ds"] = {
+      function()
+        vim.cmd([[Diff review ++layout=split]])
+      end,
+      desc = "Open review split",
+    },
+    ["<leader>Du"] = {
+      function()
+        vim.cmd([[Diff review ++layout=stacked HEAD]])
+      end,
+      desc = "Open uncommitted changes",
     },
     ["<leader>Dc"] = {
-      function()
-        vim.cmd([[DiffviewClose]])
-      end,
-      desc = "Close Diffview",
+      close_diffs,
+      desc = "Close diffs.nvim views",
     },
   },
 }
