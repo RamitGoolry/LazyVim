@@ -446,6 +446,13 @@ local function handle_message(client, line)
   vim.schedule(function()
     local action_ok, err = pcall(action, msg)
     write_state()
+    for _, delay in ipairs({ 50, 150, 300, 750 }) do
+      vim.defer_fn(function()
+        if started then
+          write_state()
+        end
+      end, delay)
+    end
     if action_ok then
       write_response(client, { id = id, ok = true })
     else
