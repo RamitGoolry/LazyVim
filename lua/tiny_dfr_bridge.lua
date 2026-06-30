@@ -47,12 +47,17 @@ local function now_ms()
   return os.time() * 1000
 end
 
-local function runtime_dir()
-  local dir = vim.env.XDG_RUNTIME_DIR
+local function runtime_root()
+  local dir = vim.env.TINY_DFR_RUNTIME_DIR
   if dir and dir ~= "" then
     return dir
   end
-  return vim.fn.stdpath("run")
+  dir = vim.env.XDG_RUNTIME_DIR
+  if dir and dir ~= "" then
+    return dir .. "/tiny-dfr"
+  end
+  local user = vim.env.USER or vim.env.LOGNAME or tostring(vim.fn.getuid())
+  return "/tmp/tiny-dfr-" .. user
 end
 
 local function bridge_paths()
@@ -60,7 +65,7 @@ local function bridge_paths()
     return paths
   end
 
-  local dir = runtime_dir() .. "/tiny-dfr/nvim"
+  local dir = runtime_root() .. "/nvim"
   local pid = tostring(state.pid)
   paths = {
     dir = dir,
