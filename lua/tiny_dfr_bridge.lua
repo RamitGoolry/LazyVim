@@ -344,6 +344,11 @@ actions["neotest.run_file"] = function()
   state.neotest.updated_at_ms = now_ms()
 end
 
+actions["neotest.run_all"] = function()
+  require_module("neotest").run.run(vim.uv.cwd())
+  state.neotest.updated_at_ms = now_ms()
+end
+
 actions["neotest.debug_nearest"] = function()
   require_module("neotest").run.run({ strategy = "dap" })
   state.neotest.updated_at_ms = now_ms()
