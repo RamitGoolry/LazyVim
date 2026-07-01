@@ -65,15 +65,52 @@ local function bridge_paths()
     return paths
   end
 
-  local dir = runtime_root() .. "/nvim"
+  local apps_dir = runtime_root() .. "/apps"
   local pid = tostring(state.pid)
   paths = {
-    dir = dir,
-    state = dir .. "/" .. pid .. ".json",
-    socket = dir .. "/" .. pid .. ".sock",
+    apps_dir = apps_dir,
+    socket = apps_dir .. "/nvim-" .. pid .. ".sock",
+    app_state = apps_dir .. "/nvim-" .. pid .. ".json",
   }
   state.socket = paths.socket
   return paths
+end
+
+local function pid_exists(pid)
+  return uv.fs_stat("/proc/" .. tostring(pid)) ~= nil
+end
+
+local function prune_stale_app_states()
+  local p = bridge_paths()
+  vim.fn.mkdir(p.apps_dir, "p")
+  local dir = uv.fs_scandir(p.apps_dir)
+  if not dir then
+    return
+  end
+  while true do
+    local name, kind = uv.fs_scandir_next(dir)
+    if not name then
+      break
+    end
+    if kind == "file" and name:match("^nvim%-%d+%.json$") then
+      local path = p.apps_dir .. "/" .. name
+      local pid = tonumber(name:match("^nvim%-(%d+)%.json$"))
+      local socket = nil
+      local fd = uv.fs_open(path, "r", 384)
+      if fd then
+        local stat = uv.fs_fstat(fd)
+        local raw = stat and uv.fs_read(fd, stat.size, 0) or nil
+        uv.fs_close(fd)
+        local ok, decoded = pcall(vim.json.decode, raw or "")
+        if ok and type(decoded) == "table" then
+          socket = decoded.socket
+        end
+      end
+      if pid and pid ~= state.pid and (not pid_exists(pid) or not socket or not uv.fs_stat(socket)) then
+        pcall(uv.fs_unlink, path)
+      end
+    end
+  end
 end
 
 local function json_encode(value)
@@ -237,15 +274,71 @@ end
 
 local function write_state()
   local p = bridge_paths()
-  vim.fn.mkdir(p.dir, "p")
+  vim.fn.mkdir(p.apps_dir, "p")
+  prune_stale_app_states()
   refresh_editor_state()
   refresh_dap_state()
 
-  local encoded = json_encode(state) .. "\n"
-  local ok, err = atomic_write(p.state, encoded)
-  if not ok then
+  local app_state = {
+    type = "state",
+    protocol = "tiny-dfr.app.v1",
+    instance_id = "nvim:" .. tostring(state.pid),
+    app = "nvim",
+    pid = state.pid,
+    socket = state.socket,
+    cwd = state.cwd,
+    surface = state.dap.active and "debug"
+      or state.dapui.visible and "debug"
+      or state.neotest.summary_visible and "test"
+      or (state.dbui.visible or state.dbui.in_buffer) and "db"
+      or "default",
+    capabilities = {
+      "dap.continue",
+      "dap.pause",
+      "dap.step_over",
+      "dap.step_into",
+      "dap.step_out",
+      "dap.restart_frame",
+      "dap.terminate",
+      "dap.toggle_breakpoint",
+      "dap.repl_toggle",
+      "dapui.toggle",
+      "debug.open",
+      "debug.close",
+      "neotest.run_nearest",
+      "neotest.run_file",
+      "neotest.run_all",
+      "neotest.debug_nearest",
+      "neotest.stop",
+      "neotest.summary_toggle",
+      "neotest.summary_open",
+      "neotest.summary_close",
+      "neotest.output_open",
+      "neotest.output_panel_toggle",
+      "dbui.open",
+      "dbui.close",
+      "dbui.toggle",
+      "dbui.find_buffer",
+      "dbui.connect",
+      "dbui.last_query_info",
+      "dbui.execute_query",
+    },
+    state = {
+      mode = state.mode,
+      file = state.file,
+      filetype = state.filetype,
+      dap = state.dap,
+      dapui = state.dapui,
+      neotest = state.neotest,
+      dbui = state.dbui,
+    },
+    updated_at_ms = now_ms(),
+  }
+
+  local app_ok, app_err = atomic_write(p.app_state, json_encode(app_state) .. "\n")
+  if not app_ok then
     vim.schedule(function()
-      vim.notify("Failed to write tiny-dfr nvim bridge state: " .. tostring(err), vim.log.levels.WARN, {
+      vim.notify("Failed to write tiny-dfr app state: " .. tostring(app_err), vim.log.levels.WARN, {
         title = "tiny-dfr bridge",
       })
     end)
@@ -406,7 +499,7 @@ actions["dbui.find_buffer"] = function()
 end
 
 actions["dbui.connect"] = function(msg)
-  local key = msg.db_key_name
+  local key = msg.db_key_name or (type(msg.params) == "table" and msg.params.db_key_name)
   if type(key) ~= "string" or key == "" then
     error("missing db_key_name")
   end
@@ -524,7 +617,7 @@ end
 
 local function start_socket()
   local p = bridge_paths()
-  vim.fn.mkdir(p.dir, "p")
+  vim.fn.mkdir(p.apps_dir, "p")
   pcall(uv.fs_unlink, p.socket)
 
   server = uv.new_pipe(false)
@@ -673,7 +766,7 @@ function M.stop()
   server = nil
   if paths then
     pcall(uv.fs_unlink, paths.socket)
-    pcall(uv.fs_unlink, paths.state)
+    pcall(uv.fs_unlink, paths.app_state)
   end
   started = false
 end
