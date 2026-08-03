@@ -36,11 +36,11 @@ return {
       pattern = "PersistedSavePre",
       group = group,
       callback = function()
-        -- Close octo and diffs.nvim buffers before saving
+        -- Close Octo and DiffBandit buffers before saving
         for _, buf in ipairs(vim.api.nvim_list_bufs()) do
           if vim.api.nvim_buf_is_valid(buf) then
             local bufname = vim.api.nvim_buf_get_name(buf)
-            if bufname:match("^octo://") or bufname:match("^diffs://") then
+            if bufname:match("^octo://") or bufname:match("^diffbandit%-commit%-%d+$") then
               vim.api.nvim_buf_delete(buf, { force = true })
             end
           end
