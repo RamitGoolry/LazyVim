@@ -383,6 +383,9 @@ keymaps.dap = {
   },
 }
 
+-- sidekick has no global default CLI; the tool is picked per call
+local SIDEKICK_CLI = "pi"
+
 local function sidekick_comment()
   local context = require("sidekick.cli.context").get()
   local selection = context:render("{selection}")
@@ -437,6 +440,7 @@ local function sidekick_comment()
 
     close()
     require("sidekick.cli").send({
+      name = SIDEKICK_CLI,
       text = require("sidekick.text").to_text(comment .. "\n\n" .. source .. "\n" .. selection),
     })
   end
@@ -454,6 +458,7 @@ keymaps.sidekick = {
     ["<leader><leader>"] = {
       function()
         require("sidekick.cli").toggle({
+          name = SIDEKICK_CLI,
           focus = false,
         })
       end,
@@ -461,19 +466,19 @@ keymaps.sidekick = {
     },
     ["<leader>aa"] = {
       function()
-        require("sidekick.cli").toggle()
+        require("sidekick.cli").toggle({ name = SIDEKICK_CLI })
       end,
       desc = "Toggle Sidekick CLI",
     },
     ["<leader>ap"] = {
       function()
-        require("sidekick.cli").select_prompt()
+        require("sidekick.cli").prompt()
       end,
       desc = "Select Sidekick Prompt",
     },
     ["<leader>af"] = {
       function()
-        require("sidekick.cli").focus()
+        require("sidekick.cli").focus({ name = SIDEKICK_CLI })
       end,
       desc = "Focus Sidekick CLI",
     },

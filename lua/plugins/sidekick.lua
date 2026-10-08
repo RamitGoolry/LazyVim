@@ -1,18 +1,6 @@
 return {
-  dir = vim.fn.stdpath("config") .. "/vendor/sidekick.nvim",
-  name = "sidekick.nvim",
+  "folke/sidekick.nvim",
   opts = {
-    ai = {
-      provider = "claude",
-    },
-    nes = {
-      enabled = false,
-      auto_fetch = false,
-    },
-    cli = {
-      mux = {
-        enabled = false,
-      },
-    },
+    nes = { enabled = false },
   },
 }
