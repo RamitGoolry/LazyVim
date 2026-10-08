@@ -7,3 +7,5 @@ foo.*
 *.log
 data
 nvim.bak/
+.sisyphus/
+.plans/
